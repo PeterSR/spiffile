@@ -1,7 +1,7 @@
 # spiffile (Python)
 
-Python implementation of the [spiffile profile](../PROFILE.md) — SPIFFE
-identities delivered as files. See the [project README](../README.md) for
+Python implementation of the [spiffile profile](https://github.com/PeterSR/spiffile/blob/main/PROFILE.md) — SPIFFE
+identities delivered as files. See the [project README](https://github.com/PeterSR/spiffile#readme) for
 the why.
 
 ## Install

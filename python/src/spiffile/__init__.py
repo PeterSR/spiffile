@@ -17,7 +17,7 @@ from .errors import (
 from .identity import Caller, Identity
 from .spiffe_id import SpiffeId
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 __all__ = [
     "Bundle",

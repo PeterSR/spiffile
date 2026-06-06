@@ -1,6 +1,6 @@
 # spiffile (Go)
 
-Go implementation of the [spiffile profile](../PROFILE.md) — SPIFFE
+Go implementation of the [spiffile profile](https://github.com/PeterSR/spiffile/blob/main/PROFILE.md) — SPIFFE
 identities delivered as files. Full surface: mint/verify JWT-SVIDs,
 trust bundles, and provisioning primitives. Used by
 [spiffile-operator](https://github.com/PeterSR/spiffile-operator).

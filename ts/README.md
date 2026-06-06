@@ -1,8 +1,8 @@
 # spiffile (TypeScript)
 
-TypeScript/Node implementation of the [spiffile profile](../PROFILE.md) —
+TypeScript/Node implementation of the [spiffile profile](https://github.com/PeterSR/spiffile/blob/main/PROFILE.md) —
 SPIFFE identities delivered as files. **Zero runtime dependencies**
-(`node:crypto` does the work). See the [project README](../README.md) for
+(`node:crypto` does the work). See the [project README](https://github.com/PeterSR/spiffile#readme) for
 the why.
 
 ## Install
