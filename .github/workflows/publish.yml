@@ -1,0 +1,60 @@
+# Publishing is tag-driven and per-language — nothing publishes until a tag
+# is pushed deliberately:
+#
+#   python-vX.Y.Z  -> PyPI   (trusted publishing / OIDC — configure the repo
+#                             as a Trusted Publisher on pypi.org first; no
+#                             long-lived token anywhere)
+#   ts-vX.Y.Z      -> npm    (provenance via OIDC; needs NPM_TOKEN secret, or
+#                             configure npm Trusted Publishing and drop it)
+#
+# Go needs no publish step at all: consumers fetch modules straight from git
+# via the module proxy. To release the Go library, push a subdirectory tag:
+#
+#   git tag go/vX.Y.Z && git push origin go/vX.Y.Z
+name: publish
+
+on:
+  push:
+    tags:
+      - "python-v*"
+      - "ts-v*"
+
+jobs:
+  pypi:
+    if: startsWith(github.ref_name, 'python-v')
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write # PyPI trusted publishing
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync && uv run pytest -q
+      - run: uv build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist
+
+  npm:
+    if: startsWith(github.ref_name, 'ts-v')
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write # npm provenance
+    defaults:
+      run:
+        working-directory: ts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm test
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
