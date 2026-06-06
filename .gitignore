@@ -1,0 +1,13 @@
+__pycache__/
+node_modules/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.agent-workspace/
+.claude/settings.local.json
