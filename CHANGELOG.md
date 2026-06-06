@@ -1,0 +1,24 @@
+# Changelog
+
+All notable changes to this project are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+The libraries are versioned and released independently (`python-vX.Y.Z`,
+`ts-vX.Y.Z`, `go/vX.Y.Z` tags) but track the same profile; entries below
+note the implementation(s) they apply to when not universal.
+
+## [Unreleased]
+
+### Added
+
+- The spiffile profile v0 ([PROFILE.md](PROFILE.md)): file layout,
+  per-identity trust bundle document, JWT-SVID requirements, verification
+  rules.
+- Python, TypeScript and Go implementations covering the full surface:
+  mint, verify (hot-reloading bundle and signing key), and provisioning
+  primitives (init/add/rotate/remove).
+- Shared conformance suite ([conformance/](conformance/)): static
+  cross-implementation fixtures plus a live cross-mint matrix, both run in
+  CI.
+
+[Unreleased]: https://github.com/PeterSR/spiffile/commits/main
