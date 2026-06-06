@@ -1,11 +1,11 @@
 # Publishing is tag-driven and per-language — nothing publishes until a tag
 # is pushed deliberately:
 #
-#   python-vX.Y.Z  -> PyPI   (trusted publishing / OIDC — configure the repo
-#                             as a Trusted Publisher on pypi.org first; no
-#                             long-lived token anywhere)
-#   ts-vX.Y.Z      -> npm    (provenance via OIDC; needs NPM_TOKEN secret, or
-#                             configure npm Trusted Publishing and drop it)
+#   python-vX.Y.Z  -> PyPI   (trusted publishing / OIDC; no long-lived token
+#                             anywhere — configured on pypi.org)
+#   ts-vX.Y.Z      -> npm    (trusted publishing / OIDC with provenance; no
+#                             token — configured on npmjs.com, package
+#                             settings -> Trusted Publisher)
 #
 # Go needs no publish step at all: consumers fetch modules straight from git
 # via the module proxy. To release the Go library, push a subdirectory tag:
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: npm
     permissions:
-      id-token: write # npm provenance
+      id-token: write # npm trusted publishing + provenance
     defaults:
       run:
         working-directory: ts
@@ -52,9 +52,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm >= 11.5.1; the runner image ships 10.x.
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm test
-      - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --access public
