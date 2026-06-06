@@ -3,6 +3,9 @@
 **A files profile for SPIFFE — and libraries that implement it.**
 
 [![test](https://github.com/PeterSR/spiffile/actions/workflows/test.yml/badge.svg)](https://github.com/PeterSR/spiffile/actions/workflows/test.yml)
+[![PyPI](https://img.shields.io/pypi/v/spiffile)](https://pypi.org/project/spiffile/)
+[![npm](https://img.shields.io/npm/v/spiffile)](https://www.npmjs.com/package/spiffile)
+[![Go Reference](https://pkg.go.dev/badge/github.com/PeterSR/spiffile/go.svg)](https://pkg.go.dev/github.com/PeterSR/spiffile/go)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 ## The hole

@@ -9,6 +9,12 @@ note the implementation(s) they apply to when not universal.
 
 ## [Unreleased]
 
+## 0.0.2 — 2026-06-06
+
+First public release: `python-v0.0.2` (PyPI), `ts-v0.0.2` (npm),
+`go/v0.0.2`. (The same-day 0.0.1 releases were superseded by packaging
+fixes.)
+
 ### Added
 
 - The spiffile profile v0 ([PROFILE.md](PROFILE.md)): file layout,
