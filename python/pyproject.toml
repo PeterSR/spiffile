@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "spiffile"
+version = "0.0.1"
+description = "SPIFFE identities delivered as files — JWT-SVIDs and trust bundles without agents"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = [
+    "PyJWT[crypto]>=2.8",
+]
+keywords = ["spiffe", "jwt-svid", "workload-identity", "service-to-service", "zero-trust"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+]
+
+[project.urls]
+Homepage = "https://github.com/PeterSR/spiffile"
+Repository = "https://github.com/PeterSR/spiffile"
+Issues = "https://github.com/PeterSR/spiffile/issues"
+Profile = "https://github.com/PeterSR/spiffile/blob/main/PROFILE.md"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.8",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
