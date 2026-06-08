@@ -1,12 +1,30 @@
 package spiffile
 
 import (
+	"crypto/ecdsa"
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
+
+// testSigningKey loads a provisioned service's private key for signing
+// hand-crafted tokens in tests.
+func testSigningKey(t *testing.T, root, name string) *ecdsa.PrivateKey {
+	t.Helper()
+	pem, err := os.ReadFile(filepath.Join(root, servicesDirname, name, DirKeyFilename))
+	if err != nil {
+		t.Fatal(err)
+	}
+	key, _, err := parsePrivateKeyPEM(pem)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return key
+}
 
 const trustDomain = "example.org"
 
@@ -154,6 +172,56 @@ func TestRoundtrip(t *testing.T) {
 	}
 	if caller.ID.String() != "spiffe://example.org/orders" {
 		t.Errorf("unexpected caller %q", caller.ID)
+	}
+}
+
+func TestUnverifiedAudience(t *testing.T) {
+	root := provisionedRoot(t)
+	orders, _ := LoadIdentity(root, "orders")
+	billing, _ := LoadIdentity(root, "billing")
+
+	token, err := orders.Token(billing.ID.String(), 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	aud, err := UnverifiedAudience(token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if aud != billing.ID.String() {
+		t.Errorf("aud = %q, want %q", aud, billing.ID.String())
+	}
+
+	if _, err := UnverifiedAudience("not.a.jwt"); err == nil {
+		t.Error("expected error for malformed token")
+	}
+
+	// A token carrying an array aud must be rejected, not silently coerced.
+	arrayAud := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+		"sub": orders.ID.String(),
+		"aud": []string{billing.ID.String(), "spiffe://example.org/other"},
+		"exp": time.Now().Add(time.Minute).Unix(),
+	})
+	signed, err := arrayAud.SignedString(testSigningKey(t, root, "orders"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := UnverifiedAudience(signed); err == nil {
+		t.Error("expected error for array aud")
+	}
+
+	// A token with no aud claim returns empty, not an error.
+	noAud := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+		"sub": orders.ID.String(),
+		"exp": time.Now().Add(time.Minute).Unix(),
+	})
+	signed, err = noAud.SignedString(testSigningKey(t, root, "orders"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := UnverifiedAudience(signed)
+	if err != nil || got != "" {
+		t.Errorf("missing aud: got %q, err %v; want empty, nil", got, err)
 	}
 }
 

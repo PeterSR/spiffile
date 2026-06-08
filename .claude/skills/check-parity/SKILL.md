@@ -46,6 +46,7 @@ is fine; *capability* must match):
 | Identity from files/env | `Identity.from_files/.from_env` | `Identity.fromFiles/.fromEnv` | `FromFiles/FromEnv` |
 | Mint (aud-bound, default 60s) | `.token` | `.token` | `.Token` |
 | Verify (aud=self default, 30s leeway, ES256-only) | `.verify` | `.verify` | `.Verify` |
+| Unverified aud read (routing/diagnostics; rejects array aud) | `unverified_audience` | `unverifiedAudience` | `UnverifiedAudience` |
 | **Signing key hot-reload** | yes | yes | yes |
 | Provision: init/add/rotate/remove/env/load | `provision.*` | `provision.*` | `InitRoot` etc. |
 

@@ -206,3 +206,27 @@ class Identity:
             f"signature does not match any key bound to {claimed_sub!r}"
             + (f" (last error: {last_error})" if last_error else "")
         )
+
+
+def unverified_audience(token: str) -> str | None:
+    """Read a JWT-SVID's ``aud`` claim WITHOUT verifying the signature.
+
+    For routing and diagnostics only — e.g. choosing which trust context to
+    verify under when the caller has not stated an expected audience. The
+    result is attacker-controlled; never use it for an access decision, always
+    follow up with :meth:`Identity.verify`.
+
+    Returns ``None`` when the token carries no ``aud``. Rejects a non-string
+    (e.g. list) ``aud`` so callers don't silently treat a multi-audience token
+    as single-audience.
+    """
+    try:
+        unverified = pyjwt.decode(token, options={"verify_signature": False})
+    except pyjwt.exceptions.PyJWTError as e:
+        raise InvalidTokenError(f"malformed token: {e}") from e
+    aud = unverified.get("aud")
+    if aud is None:
+        return None
+    if not isinstance(aud, str):
+        raise InvalidTokenError("aud must be a single string audience")
+    return aud

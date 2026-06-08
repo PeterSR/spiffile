@@ -27,6 +27,7 @@ export {
 } from "./keys.js"
 export {
   Identity,
+  unverifiedAudience,
   type Caller,
   DEFAULT_TTL_SECONDS,
   DEFAULT_LEEWAY_SECONDS,

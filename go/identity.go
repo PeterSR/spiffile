@@ -233,6 +233,35 @@ func (i *Identity) Verify(tokenString, audience string, leeway time.Duration) (C
 	return Caller{}, fmt.Errorf("signature does not match any key bound to %q: %w", claimedSub, lastErr)
 }
 
+// UnverifiedAudience returns the aud claim of a JWT-SVID WITHOUT verifying its
+// signature. It is meant only for routing and diagnostics — e.g. choosing which
+// trust context to verify under when the caller has not stated an expected
+// audience. The result is attacker-controlled; never use it for an access
+// decision, always follow up with Verify.
+//
+// The profile requires aud to be a single string: a missing aud returns ""
+// with no error, while a non-string (e.g. array) aud is rejected so callers
+// don't silently treat a multi-audience token as single-audience.
+func UnverifiedAudience(tokenString string) (string, error) {
+	unverified, _, err := jwt.NewParser().ParseUnverified(tokenString, jwt.MapClaims{})
+	if err != nil {
+		return "", fmt.Errorf("malformed token: %w", err)
+	}
+	claims, ok := unverified.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", fmt.Errorf("malformed token: unexpected claims type")
+	}
+	aud, present := claims["aud"]
+	if !present {
+		return "", nil
+	}
+	s, isString := aud.(string)
+	if !isString {
+		return "", fmt.Errorf("aud must be a single string audience")
+	}
+	return s, nil
+}
+
 // candidateKeys parses the JWKs bound to an identity into public keys,
 // preferring an exact kid match and falling back to all bound keys.
 func candidateKeys(jwks []json.RawMessage, kid string) []*ecdsa.PublicKey {

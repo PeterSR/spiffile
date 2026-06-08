@@ -3,7 +3,7 @@ import time
 import jwt as pyjwt
 import pytest
 
-from spiffile import InvalidTokenError, UnknownIdentityError
+from spiffile import InvalidTokenError, UnknownIdentityError, unverified_audience
 from spiffile.keys import private_key_from_pem
 from spiffile.provision import (
     add_service,
@@ -43,6 +43,37 @@ def test_wrong_audience_rejected(root):
     token = orders.token(audience=f"spiffe://{TRUST_DOMAIN}/someone-else")
     with pytest.raises(InvalidTokenError):
         billing.verify(token)
+
+
+def test_unverified_audience(root):
+    orders = load_identity(root, "orders")
+    billing = load_identity(root, "billing")
+
+    token = orders.token(audience=str(billing.id))
+    assert unverified_audience(token) == str(billing.id)
+
+    # malformed input is rejected
+    with pytest.raises(InvalidTokenError):
+        unverified_audience("not.a.jwt")
+
+    # an array aud is rejected, not silently coerced
+    orders_key = private_key_from_pem((root / "services" / "orders" / "key.pem").read_bytes())
+    now = int(time.time())
+    multi = pyjwt.encode(
+        {"sub": str(orders.id), "aud": [str(billing.id), "x"], "iat": now, "exp": now + 60},
+        key=orders_key,
+        algorithm="ES256",
+    )
+    with pytest.raises(InvalidTokenError):
+        unverified_audience(multi)
+
+    # a token with no aud returns None
+    no_aud = pyjwt.encode(
+        {"sub": str(orders.id), "iat": now, "exp": now + 60},
+        key=orders_key,
+        algorithm="ES256",
+    )
+    assert unverified_audience(no_aud) is None
 
 
 def test_multi_audience_rejected(root):
