@@ -9,6 +9,15 @@ note the implementation(s) they apply to when not universal.
 
 ## [Unreleased]
 
+### Added
+
+- Read a JWT-SVID's `aud` claim without verifying the signature, for routing
+  and diagnostics (e.g. picking which trust context to verify under):
+  `unverified_audience` (Python), `unverifiedAudience` (TypeScript),
+  `UnverifiedAudience` (Go). All reject an array `aud` and report a missing
+  `aud` as empty (`None`/`null`/`""`); the result is attacker-controlled and
+  must always be followed by `verify`.
+
 ## 0.0.2 — 2026-06-06
 
 First public release: `python-v0.0.2` (PyPI), `ts-v0.0.2` (npm),

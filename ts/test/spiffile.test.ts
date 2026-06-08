@@ -12,6 +12,7 @@ import {
   privateKeyFromPem,
   publicJwk,
   provision,
+  unverifiedAudience,
 } from "../src/index.js"
 
 const TRUST_DOMAIN = "example.org"
@@ -88,6 +89,29 @@ test("wrong audience rejected", () => {
 
   const token = orders.token(`spiffe://${TRUST_DOMAIN}/someone-else`)
   assert.throws(() => billing.verify(token), InvalidTokenError)
+})
+
+test("unverifiedAudience reads aud without verifying", () => {
+  const root = provisionedRoot()
+  const orders = provision.loadIdentity(root, "orders")
+  const billing = provision.loadIdentity(root, "billing")
+
+  const token = orders.token(billing.id)
+  assert.equal(unverifiedAudience(token), billing.id.toString())
+
+  // malformed input is rejected
+  assert.throws(() => unverifiedAudience("not.a.jwt"), InvalidTokenError)
+
+  // an array aud is rejected, not silently coerced
+  assert.throws(
+    () => unverifiedAudience(FIXTURES.token_orders_to_billing_multi_aud_exp_2035),
+    InvalidTokenError,
+  )
+
+  // a token with no aud returns null (signature is not checked, so a dummy sig is fine)
+  const header = Buffer.from(JSON.stringify({ alg: "ES256", typ: "JWT" })).toString("base64url")
+  const payload = Buffer.from(JSON.stringify({ sub: orders.id.toString(), exp: 9999999999 })).toString("base64url")
+  assert.equal(unverifiedAudience(`${header}.${payload}.AAAA`), null)
 })
 
 test("unknown caller rejected", () => {

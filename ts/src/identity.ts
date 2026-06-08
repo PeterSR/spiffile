@@ -203,6 +203,39 @@ export class Identity {
   }
 }
 
+/**
+ * Read a JWT-SVID's `aud` claim WITHOUT verifying the signature.
+ *
+ * For routing and diagnostics only — e.g. choosing which trust context to
+ * verify under when the caller has not stated an expected audience. The result
+ * is attacker-controlled; never use it for an access decision, always follow
+ * up with {@link Identity.verify}.
+ *
+ * Returns `null` when the token carries no `aud`. Rejects a non-string (e.g.
+ * array) `aud` so callers don't silently treat a multi-audience token as
+ * single-audience.
+ */
+export function unverifiedAudience(token: string): string | null {
+  const parts = token.split(".")
+  if (parts.length !== 3) {
+    throw new InvalidTokenError("malformed token: expected three dot-separated segments")
+  }
+  let claims: Record<string, unknown>
+  try {
+    claims = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"))
+  } catch (error) {
+    throw new InvalidTokenError(`malformed token: ${error}`)
+  }
+  const aud = claims.aud
+  if (aud === undefined || aud === null) {
+    return null
+  }
+  if (typeof aud !== "string") {
+    throw new InvalidTokenError("aud must be a single string audience")
+  }
+  return aud
+}
+
 export { FileKeySource }
 
 /** Re-exported for provisioning and tests. */

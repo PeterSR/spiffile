@@ -14,7 +14,7 @@ from .errors import (
     SpiffileError,
     UnknownIdentityError,
 )
-from .identity import Caller, Identity
+from .identity import Caller, Identity, unverified_audience
 from .spiffe_id import SpiffeId
 
 __version__ = "0.0.2"
@@ -31,4 +31,5 @@ __all__ = [
     "SpiffileError",
     "UnknownIdentityError",
     "__version__",
+    "unverified_audience",
 ]
