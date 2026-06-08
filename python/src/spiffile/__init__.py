@@ -17,7 +17,7 @@ from .errors import (
 from .identity import Caller, Identity, unverified_audience
 from .spiffe_id import SpiffeId
 
-__version__ = "0.0.2"
+__version__ = "0.1.0"
 
 __all__ = [
     "Bundle",
