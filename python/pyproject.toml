@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "spiffile"
-version = "0.0.2"
+version = "0.1.0"
 description = "SPIFFE identities delivered as files — JWT-SVIDs and trust bundles without agents"
 readme = "README.md"
 license = "Apache-2.0"

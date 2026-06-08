@@ -9,6 +9,10 @@ note the implementation(s) they apply to when not universal.
 
 ## [Unreleased]
 
+## 0.1.0 — 2026-06-08
+
+`python-v0.1.0` (PyPI), `ts-v0.1.0` (npm), `go/v0.1.0`.
+
 ### Added
 
 - Read a JWT-SVID's `aud` claim without verifying the signature, for routing
